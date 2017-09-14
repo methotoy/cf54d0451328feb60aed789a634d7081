@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Auth;
+namespace App\Http\Controllers\OwnerAuth;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
@@ -27,7 +27,7 @@ class LoginController extends Controller
      *
      * @var string
      */
-    protected $redirectTo = '/home';
+    protected $redirectTo = '/owner/home';
 
     /**
      * Create a new controller instance.
@@ -36,7 +36,27 @@ class LoginController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('guest')->except('logout');
+        $this->middleware('guest:owner_user')->except('logout');
+    }
+
+    /**
+     * Show the application's login form.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function showLoginForm()
+    {
+        return view('owner.auth.login');
+    }
+
+    /**
+     * Get the guard to be used during authentication.
+     *
+     * @return \Illuminate\Contracts\Auth\StatefulGuard
+     */
+    protected function guard()
+    {
+        return Auth::guard('owner_user');
     }
 
     /**
@@ -59,7 +79,7 @@ class LoginController extends Controller
         }
 
         if ($this->attemptLogin($request)) {
-            if($this->guard()->user()->role->type === 'Normal') {
+            if($this->guard()->user()->role->type === 'Owner') {
                 return $this->sendLoginResponse($request);
             } else {
                 $this->guard()->logout();
@@ -88,6 +108,6 @@ class LoginController extends Controller
 
         // $request->session()->invalidate();
 
-        return redirect('/login');
+        return redirect('/owner/login');
     }
 }

@@ -4,6 +4,7 @@ namespace App;
 
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use App\Notifications\OwnerResetPasswordNotification;
 
 class User extends Authenticatable
 {
@@ -15,7 +16,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password',
+        'firstname', 'lastname', 'contact_number', 'business_role', 'user_role', 'email', 'password',
     ];
 
     /**
@@ -26,4 +27,32 @@ class User extends Authenticatable
     protected $hidden = [
         'password', 'remember_token',
     ];
+
+    public function role()
+    {
+        return $this->hasOne(UserRole::class,'id','user_role');
+    }
+
+    public function isAdmin() {
+        return ($this->role->type === 'Admin')? true : false;
+    }
+
+    public function isOwner() {
+        return ($this->role->type === 'Owner')? true : false;
+    }
+
+    public function isNormal() {
+        return ($this->role->type === 'Normal')? true : false;
+    }
+
+    /**
+     * Send the password reset notification.
+     *
+     * @param  string  $token
+     * @return void
+     */
+    public function sendOwnerPasswordResetNotification($token)
+    {
+        $this->notify(new OwnerResetPasswordNotification($token));
+    }
 }
