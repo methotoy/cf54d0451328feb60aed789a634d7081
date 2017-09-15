@@ -87,7 +87,7 @@ class ForgotPasswordController extends Controller
         }
 
         if (is_null($user) || !$user->isOwner()) {
-            return static::INVALID_USER;
+            return 'passwords.user';
         }
 
         // Once we have the reset token, we are ready to send the message out to this
